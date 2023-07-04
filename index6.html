@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <title>Product Listing</title>
+</head>
+<body>
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="form-group">
+          <label for="selling-price">Selling Price:</label>
+          <input type="text" id="selling-price" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="product-name">Product Name:</label>
+          <input type="text" id="product-name" class="form-control">
+        </div>
+        <button type="button" id="add-product" class="btn btn-primary">Add Product</button>
+      </div>
+    </div>
+    <div class="row mt-5">
+      <div class="col-lg-6">
+        <h2>Products</h2>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Selling Price</th>
+              <th>Product Name</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="product-list">
+            <tr>
+              <td>20000</td>
+              <td>Nikon Camera</td>
+              <td><button class="btn btn-danger delete-product">Delete Product</button></td>
+            </tr>
+            <tr>
+              <td>21000</td>
+              <td>Canon Camera</td>
+              <td><button class="btn btn-danger delete-product">Delete Product</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div id="total-value" class="mt-3">
+          <strong>Total Value Worth of Products:</strong> Rs 41000
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/esm/axios.js"></script>
+  <script>
+    // Delete product functionality
+    $(document).on('click', '.delete-product', function() {
+      $(this).closest('tr').remove();
+      updateTotalValue();
+    });
+
+    // Add product functionality
+    $('#add-product').click(function() {
+      var sellingPrice = $('#selling-price').val();
+      var productName = $('#product-name').val();
+      
+      if (sellingPrice && productName) {
+        var newRow = '<tr><td>' + sellingPrice + '</td><td>' + productName + '</td><td><button class="btn btn-danger delete-product">Delete Product</button></td></tr>';
+        $('#product-list').append(newRow);
+        updateTotalValue();
+        $('#selling-price').val('');
+        $('#product-name').val('');
+      }
+    });
+
+    axios.post("https://crudcrud.com/api/ba2fbc9d3c4e4b2ababf462bf2647221/candyinventry")
+    .then((response) => response.data['rows'])
+    .catch(()=> console.log(`Error fetching data`))
+    .then((productsData)=> productsData? renderProductsList(productsData): null );
+    
+
+    // Update total value
+    function updateTotalValue() {
+      var totalValue = 0;
+      $('#product-list tr').each(function() {
+        var price = parseFloat($(this).find('td:first').text());
+        totalValue += price;
+      });
+      $('#total-value').html('<strong>Total Value Worth of Products:</strong> Rs ' + totalValue);
+    }
+  </script>
+</body>
+</html>
