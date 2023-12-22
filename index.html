@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <title>Candy Shop</title>
+</head>
+<body>
+  <div class="container mt-5">
+    <h2>Candy Shop</h2>
+    <form>
+      <div class="form-row">
+        <div class="col-md-2">
+          <select class="form-control" id="candyName">
+            <option value="Eclairs">Eclairs</option>
+            <option value="Lollipop">Lollipop</option>
+            <option value="Chocolate Bar">Chocolate Bar</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select class="form-control" id="description">
+            <option value="Chocolaty">Chocolaty</option>
+            <option value="Orange Flavor">Orange Flavor</option>
+            <option value="Sweet">Sweet</option>
+            <option value="Bitter and Sweet">Bitter and Sweet</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <input type="text" class="form-control" id="cost" placeholder="Price">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="quantity" placeholder="Quantity">
+        </div>
+        <div class="col-md-3">
+          <button type="button" class="btn btn-primary" id="addItemBtn">Add Items</button>
+        </div>
+      </div>
+    </form>
+    
+    <div class="mt-5">
+      <h4>Inventory</h4>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Candy Name</th>
+            <th>Description</th>
+            <th>Cost</th>
+            <th>Quantity</th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="inventoryList">
+          <!-- Inventory items will be dynamically added here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+   <!-- Bootstrap JS -->
+   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+   <script>
+     let inventory = [
+       { candyName: 'Eclairs', description: 'Chocolaty', cost: '1 rs', quantity: 100 },
+       { candyName: 'Lollipop', description: 'Orange Flavor', cost: '2 rs', quantity: 50 },
+       { candyName: 'Chocolate Bar', description: 'Sweet', cost: '5 rs', quantity: 200 }
+     ];
+ 
+     // Function to save inventory data to local storage
+     function saveInventoryToLocalStorage() {
+       localStorage.setItem('inventory', JSON.stringify(inventory));
+     }
+ 
+     // Function to load inventory data from local storage
+     function loadInventoryFromLocalStorage() {
+       const savedInventory = localStorage.getItem('inventory');
+       if (savedInventory) {
+         inventory = JSON.parse(savedInventory);
+       }
+     }
+ 
+     // Function to add items to the inventory
+     function addItem() {
+        const candyName = document.getElementById('candyName').value;
+        const description = document.getElementById('description').value;
+        const cost = document.getElementById('cost').value; // Updated line to get the entered cost
+        const quantity = document.getElementById('quantity').value; // Updated line to get the entered quantity
+        
+        const item = { candyName, description, cost, quantity };
+        inventory.push(item);
+        
+        saveInventoryToLocalStorage();
+        displayInventory();
+      }
+ 
+     // Function to get the cost of a candy based on its name
+     function getCandyCost(candyName) {
+       switch (candyName) {
+         case 'Eclairs':
+           return '1 rs';
+         case 'Lollipop':
+           return '2 rs';
+         case 'Chocolate Bar':
+           return '5 rs';
+         default:
+           return '';
+       }
+     }
+ 
+     // Function to get the quantity of a candy based on its name
+     function getCandyQuantity(candyName) {
+       for (const item of inventory) {
+         if (item.candyName === candyName) {
+           return item.quantity;
+         }
+       }
+       return 0;
+     }
+ 
+     // Function to display the inventory
+     function displayInventory() {
+       const inventoryList = document.getElementById('inventoryList');
+       inventoryList.innerHTML = '';
+ 
+       inventory.forEach((item, index) => {
+         const row = document.createElement('tr');
+         row.innerHTML = `
+            <td>${item.candyName}</td>
+            <td>${item.description}</td>
+            <td>${item.cost}</td>
+            <td>${item.quantity}</td>
+            <td><button class="btn btn-success" onclick="buyOne(${index})">Buy One</button></td>
+            <td><button class="btn btn-success" onclick="buyTwo(${index})">Buy Two</button></td>
+            <td><button class="btn btn-success" onclick="buyThree(${index})">Buy Three</button></td>
+            <td><button class="btn btn-danger" onclick="deleteItem(${index})">Delete</button></td>
+        `;
+         inventoryList.appendChild(row);
+       });
+     }
+ 
+     // Functions to buy candies
+     function buyOne(index) {
+       inventory[index].quantity--;
+       saveInventoryToLocalStorage();
+       displayInventory();
+     }
+ 
+     function buyTwo(index) {
+       inventory[index].quantity -= 2;
+       saveInventoryToLocalStorage();
+       displayInventory();
+     }
+ 
+     function buyThree(index) {
+       inventory[index].quantity -= 3;
+       saveInventoryToLocalStorage();
+       displayInventory();
+     }
+
+     // Function to delete an item from the inventory
+    function deleteItem(index) {
+        inventory.splice(index, 1);
+        saveInventoryToLocalStorage();
+        displayInventory();
+    }
+ 
+     document.getElementById('addItemBtn').addEventListener('click', addItem);
+ 
+     loadInventoryFromLocalStorage();
+     displayInventory();
+   </script>
+ </body>
+ </html>
